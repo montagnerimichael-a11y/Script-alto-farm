@@ -1,4 +1,4 @@
-print("🚀 Iniciando...")
+print("🚀 Iniciando Auto Farm Premium...")
 
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
@@ -20,286 +20,366 @@ local loopColeta = nil
 local loopKill = nil
 local loopOrbes = nil
 
--- ===== INTERFACE =====
+-- ===== SOM =====
+local function playSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://9120387848" -- Som de clique
+    sound.Volume = 0.3
+    sound.Parent = game.Workspace
+    sound:Play()
+    game:GetService("Debris"):AddItem(sound, 1)
+end
+
+-- ============================================
+-- INTERFACE BONITA
+-- ============================================
+
 local gui = Instance.new("ScreenGui")
-gui.Name = "Farm"
+gui.Name = "AutoFarmPremium"
 gui.Parent = player.PlayerGui
 gui.ResetOnSpawn = false
 
+-- Fundo escuro
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.BackgroundTransparency = 0.6
+bg.Parent = gui
+
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 220, 0, 260)
-frame.Position = UDim2.new(0.5, -110, 0.5, -130)
-frame.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
-frame.BackgroundTransparency = 0.1
+frame.Size = UDim2.new(0, 380, 0, 420)
+frame.Position = UDim2.new(0.5, -190, 0.5, -210)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 45)
+frame.BackgroundTransparency = 0.05
+frame.BorderSizePixel = 0
 frame.Parent = gui
 frame.Draggable = true
 frame.Active = true
 
+-- Sombra
+local shadow = Instance.new("Frame")
+shadow.Size = UDim2.new(1, 20, 1, 20)
+shadow.Position = UDim2.new(0, -10, 0, -10)
+shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+shadow.BackgroundTransparency = 0.7
+shadow.BorderSizePixel = 0
+shadow.Parent = frame
+
+local shadowCorner = Instance.new("UICorner")
+shadowCorner.CornerRadius = UDim.new(0, 16)
+shadowCorner.Parent = shadow
+
+-- Bordas arredondadas
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 16)
+corner.Parent = frame
+
+-- Efeito de brilho (gradiente)
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 80)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 50))
+})
+gradient.Parent = frame
+
+-- ===== CABEÇALHO =====
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 50)
+header.BackgroundColor3 = Color3.fromRGB(30, 30, 70)
+header.BackgroundTransparency = 0.1
+header.BorderSizePixel = 0
+header.Parent = frame
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 16)
+headerCorner.Parent = header
+
+-- Título com ícone animado
 local titulo = Instance.new("TextLabel")
-titulo.Size = UDim2.new(1, 0, 0, 30)
-titulo.BackgroundColor3 = Color3.fromRGB(30, 30, 60)
-titulo.Text = "⚔️ AUTO FARM"
+titulo.Size = UDim2.new(1, -80, 1, 0)
+titulo.Position = UDim2.new(0, 15, 0, 0)
+titulo.BackgroundTransparency = 1
+titulo.Text = "⚡ AUTO FARM PREMIUM ⚡"
 titulo.TextColor3 = Color3.fromRGB(0, 200, 255)
 titulo.TextScaled = true
 titulo.Font = Enum.Font.GothamBold
-titulo.Parent = frame
+titulo.TextXAlignment = Enum.TextXAlignment.Left
+titulo.Parent = header
 
--- FECHAR
+-- Efeito de brilho no título
+local titleGlow = Instance.new("TextLabel")
+titleGlow.Size = UDim2.new(1, -80, 1, 0)
+titleGlow.Position = UDim2.new(0, 16, 0, 1)
+titleGlow.BackgroundTransparency = 1
+titleGlow.Text = "⚡ AUTO FARM PREMIUM ⚡"
+titleGlow.TextColor3 = Color3.fromRGB(0, 150, 200)
+titleGlow.TextScaled = true
+titleGlow.Font = Enum.Font.GothamBold
+titleGlow.TextXAlignment = Enum.TextXAlignment.Left
+titleGlow.TextTransparency = 0.5
+titleGlow.Parent = header
+
+-- Botão Minimizar com ícone
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 32, 0, 32)
+minBtn.Position = UDim2.new(1, -70, 0, 9)
+minBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
+minBtn.BackgroundTransparency = 0.2
+minBtn.Text = "➖"
+minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minBtn.TextSize = 18
+minBtn.Font = Enum.Font.GothamBold
+minBtn.BorderSizePixel = 0
+minBtn.Parent = header
+
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(0, 8)
+minCorner.Parent = minBtn
+
+-- Botão Fechar com ícone
 local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 22, 0, 22)
-closeBtn.Position = UDim2.new(1, -25, 0, 4)
+closeBtn.Size = UDim2.new(0, 32, 0, 32)
+closeBtn.Position = UDim2.new(1, -34, 0, 9)
 closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.BackgroundTransparency = 0.2
 closeBtn.Text = "✕"
 closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeBtn.TextSize = 12
+closeBtn.TextSize = 16
 closeBtn.Font = Enum.Font.GothamBold
-closeBtn.Parent = titulo
+closeBtn.BorderSizePixel = 0
+closeBtn.Parent = header
 
--- MINIMIZAR
-local minBtn = Instance.new("TextButton")
-minBtn.Size = UDim2.new(0, 22, 0, 22)
-minBtn.Position = UDim2.new(1, -50, 0, 4)
-minBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
-minBtn.Text = "─"
-minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minBtn.TextSize = 14
-minBtn.Font = Enum.Font.GothamBold
-minBtn.Parent = titulo
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = closeBtn
 
+-- ===== CONTEÚDO =====
 local content = Instance.new("Frame")
-content.Size = UDim2.new(1, -10, 1, -35)
-content.Position = UDim2.new(0, 5, 0, 33)
+content.Size = UDim2.new(1, -30, 1, -60)
+content.Position = UDim2.new(0, 15, 0, 55)
 content.BackgroundTransparency = 1
 content.Parent = frame
 
--- STATUS
+-- ===== STATUS =====
+local statusFrame = Instance.new("Frame")
+statusFrame.Size = UDim2.new(1, 0, 0, 30)
+statusFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 60)
+statusFrame.BackgroundTransparency = 0.3
+statusFrame.BorderSizePixel = 0
+statusFrame.Parent = content
+
+local statusCorner = Instance.new("UICorner")
+statusCorner.CornerRadius = UDim.new(0, 8)
+statusCorner.Parent = statusFrame
+
+local statusIcon = Instance.new("TextLabel")
+statusIcon.Size = UDim2.new(0, 30, 1, 0)
+statusIcon.BackgroundTransparency = 1
+statusIcon.Text = "❤️"
+statusIcon.TextColor3 = Color3.fromRGB(255, 50, 50)
+statusIcon.TextSize = 18
+statusIcon.Font = Enum.Font.GothamBold
+statusIcon.Parent = statusFrame
+
 local statusText = Instance.new("TextLabel")
-statusText.Size = UDim2.new(1, 0, 0, 16)
+statusText.Size = UDim2.new(1, -40, 1, 0)
+statusText.Position = UDim2.new(0, 35, 0, 0)
 statusText.BackgroundTransparency = 1
-statusText.Text = "❤️ VIVO"
+statusText.Text = "🟢 VIVO"
 statusText.TextColor3 = Color3.fromRGB(0, 255, 100)
-statusText.TextSize = 11
+statusText.TextSize = 14
 statusText.Font = Enum.Font.GothamBold
 statusText.TextXAlignment = Enum.TextXAlignment.Left
-statusText.Parent = content
+statusText.Parent = statusFrame
 
--- BOTÃO COLETA
+-- ===== BOTÃO COLETA (LIGA/DESLIGA) =====
 local btnColeta = Instance.new("TextButton")
-btnColeta.Size = UDim2.new(1, 0, 0, 26)
-btnColeta.Position = UDim2.new(0, 0, 0, 20)
+btnColeta.Size = UDim2.new(1, 0, 0, 40)
+btnColeta.Position = UDim2.new(0, 0, 0, 40)
 btnColeta.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-btnColeta.Text = "💎 ATIVAR COLETA"
+btnColeta.BackgroundTransparency = 0.15
+btnColeta.Text = "💎 COLETA DIAMANTES: DESLIGADO"
 btnColeta.TextColor3 = Color3.fromRGB(255, 255, 255)
-btnColeta.TextSize = 11
+btnColeta.TextSize = 13
 btnColeta.Font = Enum.Font.GothamBold
+btnColeta.BorderSizePixel = 0
 btnColeta.Parent = content
 
+local btnColetaCorner = Instance.new("UICorner")
+btnColetaCorner.CornerRadius = UDim.new(0, 10)
+btnColetaCorner.Parent = btnColeta
+
+-- Status Coleta
 local statusColeta = Instance.new("TextLabel")
-statusColeta.Size = UDim2.new(1, 0, 0, 14)
-statusColeta.Position = UDim2.new(0, 0, 0, 48)
-statusColeta.Text = "🔴 Desativado"
-statusColeta.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusColeta.Size = UDim2.new(1, 0, 0, 16)
+statusColeta.Position = UDim2.new(0, 0, 0, 84)
 statusColeta.BackgroundTransparency = 1
-statusColeta.TextSize = 10
+statusColeta.Text = "🔴 DESATIVADO"
+statusColeta.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusColeta.TextSize = 11
 statusColeta.Font = Enum.Font.Gotham
+statusColeta.TextXAlignment = Enum.TextXAlignment.Center
 statusColeta.Parent = content
 
--- RAIO COLETA
-local raioText = Instance.new("TextLabel")
-raioText.Size = UDim2.new(0.5, 0, 0, 14)
-raioText.Position = UDim2.new(0, 0, 0, 64)
-raioText.Text = "📏 Coleta:150"
-raioText.TextColor3 = Color3.fromRGB(200, 200, 200)
-raioText.BackgroundTransparency = 1
-raioText.TextSize = 9
-raioText.Font = Enum.Font.Gotham
-raioText.Parent = content
-
-local raioMenos = Instance.new("TextButton")
-raioMenos.Size = UDim2.new(0, 16, 0, 12)
-raioMenos.Position = UDim2.new(1, -65, 0, 65)
-raioMenos.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-raioMenos.Text = "−"
-raioMenos.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioMenos.TextSize = 9
-raioMenos.Font = Enum.Font.GothamBold
-raioMenos.Parent = content
-
-local raioValor = Instance.new("TextLabel")
-raioValor.Size = UDim2.new(0, 25, 0, 14)
-raioValor.Position = UDim2.new(1, -42, 0, 64)
-raioValor.Text = raio
-raioValor.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioValor.BackgroundTransparency = 1
-raioValor.TextSize = 9
-raioValor.Font = Enum.Font.GothamBold
-raioValor.Parent = content
-
-local raioMais = Instance.new("TextButton")
-raioMais.Size = UDim2.new(0, 16, 0, 12)
-raioMais.Position = UDim2.new(1, -20, 0, 65)
-raioMais.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-raioMais.Text = "+"
-raioMais.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioMais.TextSize = 9
-raioMais.Font = Enum.Font.GothamBold
-raioMais.Parent = content
-
--- BOTÃO KILL
+-- ===== BOTÃO KILL (LIGA/DESLIGA) =====
 local btnKill = Instance.new("TextButton")
-btnKill.Size = UDim2.new(1, 0, 0, 26)
-btnKill.Position = UDim2.new(0, 0, 0, 82)
+btnKill.Size = UDim2.new(1, 0, 0, 40)
+btnKill.Position = UDim2.new(0, 0, 0, 108)
 btnKill.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-btnKill.Text = "⚔️ ATIVAR KILL"
+btnKill.BackgroundTransparency = 0.15
+btnKill.Text = "⚔️ AUTO KILL: DESLIGADO"
 btnKill.TextColor3 = Color3.fromRGB(255, 255, 255)
-btnKill.TextSize = 11
+btnKill.TextSize = 13
 btnKill.Font = Enum.Font.GothamBold
+btnKill.BorderSizePixel = 0
 btnKill.Parent = content
 
+local btnKillCorner = Instance.new("UICorner")
+btnKillCorner.CornerRadius = UDim.new(0, 10)
+btnKillCorner.Parent = btnKill
+
+-- Status Kill
 local statusKill = Instance.new("TextLabel")
-statusKill.Size = UDim2.new(1, 0, 0, 14)
-statusKill.Position = UDim2.new(0, 0, 0, 110)
-statusKill.Text = "🔴 Desativado"
-statusKill.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusKill.Size = UDim2.new(1, 0, 0, 16)
+statusKill.Position = UDim2.new(0, 0, 0, 152)
 statusKill.BackgroundTransparency = 1
-statusKill.TextSize = 10
+statusKill.Text = "🔴 DESATIVADO"
+statusKill.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusKill.TextSize = 11
 statusKill.Font = Enum.Font.Gotham
+statusKill.TextXAlignment = Enum.TextXAlignment.Center
 statusKill.Parent = content
 
--- RAIO KILL
-local raioKillText = Instance.new("TextLabel")
-raioKillText.Size = UDim2.new(0.5, 0, 0, 14)
-raioKillText.Position = UDim2.new(0, 0, 0, 126)
-raioKillText.Text = "📏 Kill:150"
-raioKillText.TextColor3 = Color3.fromRGB(200, 200, 200)
-raioKillText.BackgroundTransparency = 1
-raioKillText.TextSize = 9
-raioKillText.Font = Enum.Font.Gotham
-raioKillText.Parent = content
-
-local raioKillMenos = Instance.new("TextButton")
-raioKillMenos.Size = UDim2.new(0, 16, 0, 12)
-raioKillMenos.Position = UDim2.new(1, -65, 0, 127)
-raioKillMenos.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-raioKillMenos.Text = "−"
-raioKillMenos.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioKillMenos.TextSize = 9
-raioKillMenos.Font = Enum.Font.GothamBold
-raioKillMenos.Parent = content
-
-local raioKillValor = Instance.new("TextLabel")
-raioKillValor.Size = UDim2.new(0, 25, 0, 14)
-raioKillValor.Position = UDim2.new(1, -42, 0, 126)
-raioKillValor.Text = raio
-raioKillValor.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioKillValor.BackgroundTransparency = 1
-raioKillValor.TextSize = 9
-raioKillValor.Font = Enum.Font.GothamBold
-raioKillValor.Parent = content
-
-local raioKillMais = Instance.new("TextButton")
-raioKillMais.Size = UDim2.new(0, 16, 0, 12)
-raioKillMais.Position = UDim2.new(1, -20, 0, 127)
-raioKillMais.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-raioKillMais.Text = "+"
-raioKillMais.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioKillMais.TextSize = 9
-raioKillMais.Font = Enum.Font.GothamBold
-raioKillMais.Parent = content
-
--- BOTÃO ORBES
+-- ===== BOTÃO ORBES (LIGA/DESLIGA) =====
 local btnOrbes = Instance.new("TextButton")
-btnOrbes.Size = UDim2.new(1, 0, 0, 26)
-btnOrbes.Position = UDim2.new(0, 0, 0, 144)
+btnOrbes.Size = UDim2.new(1, 0, 0, 40)
+btnOrbes.Position = UDim2.new(0, 0, 0, 176)
 btnOrbes.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
-btnOrbes.Text = "⚪ ATIVAR ORBES"
+btnOrbes.BackgroundTransparency = 0.15
+btnOrbes.Text = "⚪ COLETA ORBES: DESLIGADO"
 btnOrbes.TextColor3 = Color3.fromRGB(255, 255, 255)
-btnOrbes.TextSize = 11
+btnOrbes.TextSize = 13
 btnOrbes.Font = Enum.Font.GothamBold
+btnOrbes.BorderSizePixel = 0
 btnOrbes.Parent = content
 
+local btnOrbesCorner = Instance.new("UICorner")
+btnOrbesCorner.CornerRadius = UDim.new(0, 10)
+btnOrbesCorner.Parent = btnOrbes
+
+-- Status Orbes
 local statusOrbes = Instance.new("TextLabel")
-statusOrbes.Size = UDim2.new(1, 0, 0, 14)
-statusOrbes.Position = UDim2.new(0, 0, 0, 172)
-statusOrbes.Text = "🔴 Desativado"
-statusOrbes.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusOrbes.Size = UDim2.new(1, 0, 0, 16)
+statusOrbes.Position = UDim2.new(0, 0, 0, 220)
 statusOrbes.BackgroundTransparency = 1
-statusOrbes.TextSize = 10
+statusOrbes.Text = "🔴 DESATIVADO"
+statusOrbes.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusOrbes.TextSize = 11
 statusOrbes.Font = Enum.Font.Gotham
+statusOrbes.TextXAlignment = Enum.TextXAlignment.Center
 statusOrbes.Parent = content
 
--- DETECTOR ORBES
-local orbesDetect = Instance.new("TextLabel")
-orbesDetect.Size = UDim2.new(1, 0, 0, 14)
-orbesDetect.Position = UDim2.new(0, 0, 0, 188)
-orbesDetect.Text = "🔍 Orbes: 0"
-orbesDetect.TextColor3 = Color3.fromRGB(200, 200, 200)
-orbesDetect.BackgroundTransparency = 1
-orbesDetect.TextSize = 9
-orbesDetect.Font = Enum.Font.Gotham
-orbesDetect.Parent = content
+-- ===== RAIO (com + e -) =====
+local raioFrame = Instance.new("Frame")
+raioFrame.Size = UDim2.new(1, 0, 0, 30)
+raioFrame.Position = UDim2.new(0, 0, 0, 244)
+raioFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 60)
+raioFrame.BackgroundTransparency = 0.3
+raioFrame.BorderSizePixel = 0
+raioFrame.Parent = content
 
--- RAIO ORBES
-local raioOrbesText = Instance.new("TextLabel")
-raioOrbesText.Size = UDim2.new(0.5, 0, 0, 14)
-raioOrbesText.Position = UDim2.new(0, 0, 0, 204)
-raioOrbesText.Text = "📏 Orbes:150"
-raioOrbesText.TextColor3 = Color3.fromRGB(200, 200, 200)
-raioOrbesText.BackgroundTransparency = 1
-raioOrbesText.TextSize = 9
-raioOrbesText.Font = Enum.Font.Gotham
-raioOrbesText.Parent = content
+local raioCorner = Instance.new("UICorner")
+raioCorner.CornerRadius = UDim.new(0, 8)
+raioCorner.Parent = raioFrame
 
-local raioOrbesMenos = Instance.new("TextButton")
-raioOrbesMenos.Size = UDim2.new(0, 16, 0, 12)
-raioOrbesMenos.Position = UDim2.new(1, -65, 0, 205)
-raioOrbesMenos.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-raioOrbesMenos.Text = "−"
-raioOrbesMenos.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioOrbesMenos.TextSize = 9
-raioOrbesMenos.Font = Enum.Font.GothamBold
-raioOrbesMenos.Parent = content
+local raioText = Instance.new("TextLabel")
+raioText.Size = UDim2.new(0.4, 0, 1, 0)
+raioText.Position = UDim2.new(0, 10, 0, 0)
+raioText.BackgroundTransparency = 1
+raioText.Text = "📏 RAIO: 150"
+raioText.TextColor3 = Color3.fromRGB(200, 200, 200)
+raioText.TextSize = 12
+raioText.Font = Enum.Font.Gotham
+raioText.TextXAlignment = Enum.TextXAlignment.Left
+raioText.Parent = raioFrame
 
-local raioOrbesValor = Instance.new("TextLabel")
-raioOrbesValor.Size = UDim2.new(0, 25, 0, 14)
-raioOrbesValor.Position = UDim2.new(1, -42, 0, 204)
-raioOrbesValor.Text = raio
-raioOrbesValor.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioOrbesValor.BackgroundTransparency = 1
-raioOrbesValor.TextSize = 9
-raioOrbesValor.Font = Enum.Font.GothamBold
-raioOrbesValor.Parent = content
+local raioMenos = Instance.new("TextButton")
+raioMenos.Size = UDim2.new(0, 28, 0, 22)
+raioMenos.Position = UDim2.new(1, -68, 0.5, -11)
+raioMenos.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+raioMenos.BackgroundTransparency = 0.2
+raioMenos.Text = "−"
+raioMenos.TextColor3 = Color3.fromRGB(255, 255, 255)
+raioMenos.TextSize = 16
+raioMenos.Font = Enum.Font.GothamBold
+raioMenos.BorderSizePixel = 0
+raioMenos.Parent = raioFrame
 
-local raioOrbesMais = Instance.new("TextButton")
-raioOrbesMais.Size = UDim2.new(0, 16, 0, 12)
-raioOrbesMais.Position = UDim2.new(1, -20, 0, 205)
-raioOrbesMais.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-raioOrbesMais.Text = "+"
-raioOrbesMais.TextColor3 = Color3.fromRGB(255, 255, 255)
-raioOrbesMais.TextSize = 9
-raioOrbesMais.Font = Enum.Font.GothamBold
-raioOrbesMais.Parent = content
+local raioMenosCorner = Instance.new("UICorner")
+raioMenosCorner.CornerRadius = UDim.new(0, 6)
+raioMenosCorner.Parent = raioMenos
 
--- CONTADOR
+local raioValor = Instance.new("TextLabel")
+raioValor.Size = UDim2.new(0, 30, 1, 0)
+raioValor.Position = UDim2.new(1, -38, 0, 0)
+raioValor.BackgroundTransparency = 1
+raioValor.Text = raio
+raioValor.TextColor3 = Color3.fromRGB(255, 255, 255)
+raioValor.TextSize = 12
+raioValor.Font = Enum.Font.GothamBold
+raioValor.TextXAlignment = Enum.TextXAlignment.Center
+raioValor.Parent = raioFrame
+
+local raioMais = Instance.new("TextButton")
+raioMais.Size = UDim2.new(0, 28, 0, 22)
+raioMais.Position = UDim2.new(1, -34, 0.5, -11)
+raioMais.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+raioMais.BackgroundTransparency = 0.2
+raioMais.Text = "+"
+raioMais.TextColor3 = Color3.fromRGB(255, 255, 255)
+raioMais.TextSize = 16
+raioMais.Font = Enum.Font.GothamBold
+raioMais.BorderSizePixel = 0
+raioMais.Parent = raioFrame
+
+local raioMaisCorner = Instance.new("UICorner")
+raioMaisCorner.CornerRadius = UDim.new(0, 6)
+raioMaisCorner.Parent = raioMais
+
+-- ===== CONTADORES =====
 local contador = Instance.new("TextLabel")
-contador.Size = UDim2.new(1, 0, 0, 14)
-contador.Position = UDim2.new(0, 0, 0, 222)
-contador.Text = "💎0 ⚔️0 ⚪0"
-contador.TextColor3 = Color3.fromRGB(200, 200, 200)
+contador.Size = UDim2.new(1, 0, 0, 20)
+contador.Position = UDim2.new(0, 0, 0, 280)
 contador.BackgroundTransparency = 1
-contador.TextSize = 9
+contador.Text = "💎 0  |  ⚔️ 0  |  ⚪ 0"
+contador.TextColor3 = Color3.fromRGB(200, 200, 200)
+contador.TextSize = 13
 contador.Font = Enum.Font.Gotham
+contador.TextXAlignment = Enum.TextXAlignment.Center
 contador.Parent = content
 
--- ALVO
+-- ===== DETECTOR ORBES =====
+local orbesDetect = Instance.new("TextLabel")
+orbesDetect.Size = UDim2.new(1, 0, 0, 16)
+orbesDetect.Position = UDim2.new(0, 0, 0, 302)
+orbesDetect.BackgroundTransparency = 1
+orbesDetect.Text = "🔍 ORBES NO MAPA: 0"
+orbesDetect.TextColor3 = Color3.fromRGB(200, 200, 200)
+orbesDetect.TextSize = 11
+orbesDetect.Font = Enum.Font.Gotham
+orbesDetect.TextXAlignment = Enum.TextXAlignment.Center
+orbesDetect.Parent = content
+
+-- ===== ALVO =====
 local alvoText = Instance.new("TextLabel")
-alvoText.Size = UDim2.new(1, 0, 0, 14)
-alvoText.Position = UDim2.new(0, 0, 0, 238)
-alvoText.Text = "🎯 Nenhum"
-alvoText.TextColor3 = Color3.fromRGB(200, 200, 200)
+alvoText.Size = UDim2.new(1, 0, 0, 16)
+alvoText.Position = UDim2.new(0, 0, 0, 320)
 alvoText.BackgroundTransparency = 1
-alvoText.TextSize = 9
+alvoText.Text = "🎯 NENHUM ALVO"
+alvoText.TextColor3 = Color3.fromRGB(200, 200, 200)
+alvoText.TextSize = 11
 alvoText.Font = Enum.Font.Gotham
+alvoText.TextXAlignment = Enum.TextXAlignment.Center
 alvoText.Parent = content
 
 -- ============================================
@@ -401,7 +481,7 @@ function coletarDiamantes()
     end
     if count > 0 then
         diamantes = diamantes + count
-        contador.Text = "💎"..diamantes.." ⚔️"..kills.." ⚪"..orbes
+        contador.Text = "💎 "..diamantes.."  |  ⚔️ "..kills.."  |  ⚪ "..orbes
     end
 end
 
@@ -426,14 +506,14 @@ function coletarOrbes()
     end
     if count > 0 then
         orbes = orbes + count
-        contador.Text = "💎"..diamantes.." ⚔️"..kills.." ⚪"..orbes
+        contador.Text = "💎 "..diamantes.."  |  ⚔️ "..kills.."  |  ⚪ "..orbes
     end
     local total = contarOrbes()
     if total > 0 then
-        orbesDetect.Text = "🟢 Orbes: "..total
+        orbesDetect.Text = "🟢 ORBES NO MAPA: "..total
         orbesDetect.TextColor3 = Color3.fromRGB(0, 255, 100)
     else
-        orbesDetect.Text = "🔴 Orbes: 0"
+        orbesDetect.Text = "🔴 ORBES NO MAPA: 0"
         orbesDetect.TextColor3 = Color3.fromRGB(255, 100, 100)
     end
 end
@@ -443,11 +523,11 @@ function loopKill()
     
     if not vivo() then
         matando = false
-        btnKill.Text = "⚔️ ATIVAR KILL"
+        btnKill.Text = "⚔️ AUTO KILL: DESLIGADO"
         btnKill.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        statusKill.Text = "💀 Desativado"
+        statusKill.Text = "🔴 DESATIVADO"
         statusKill.TextColor3 = Color3.fromRGB(255, 100, 100)
-        alvoText.Text = "🎯 Morto"
+        alvoText.Text = "🎯 MORTO"
         alvoText.TextColor3 = Color3.fromRGB(200, 50, 50)
         if loopKill then loopKill:Disconnect() loopKill = nil end
         return
@@ -456,7 +536,7 @@ function loopKill()
     if not espada or not espada.Parent then
         acharEspada()
         if not espada then
-            statusKill.Text = "⚠️ Sem espada!"
+            statusKill.Text = "⚠️ SEM ESPADA!"
             statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
             wait(2)
             return
@@ -469,9 +549,9 @@ function loopKill()
             alvoText.Text = "🎯 "..alvo.Name
             alvoText.TextColor3 = Color3.fromRGB(255, 50, 50)
         else
-            alvoText.Text = "🎯 Nenhum"
+            alvoText.Text = "🎯 NENHUM ALVO"
             alvoText.TextColor3 = Color3.fromRGB(200, 200, 200)
-            statusKill.Text = "🔍 Procurando..."
+            statusKill.Text = "🔍 PROCURANDO..."
             statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
             wait(1)
             return
@@ -491,7 +571,7 @@ function loopKill()
             if dist > 20 then
                 local dir = (posCostas - hrp.Position).Unit
                 hrp.CFrame = hrp.CFrame + (dir * 8)
-                statusKill.Text = "🏃 Correndo..."
+                statusKill.Text = "🏃 CORRENDO..."
                 statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
                 return
             end
@@ -499,7 +579,7 @@ function loopKill()
             if dist > 5 then
                 local dirCostas = (posCostas - hrp.Position).Unit
                 hrp.CFrame = hrp.CFrame + (dirCostas * 6)
-                statusKill.Text = "🎯 Flanqueando..."
+                statusKill.Text = "🎯 FLANQUEANDO..."
                 statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
                 return
             end
@@ -514,7 +594,85 @@ function loopKill()
             end)
             
             kills = kills + 1
-            contador.Text = "💎"..diamantes.." ⚔️"..kills.." ⚪"..orbes
+            contador.Textfunction loopKill()
+    if not matando then return end
+    
+    if not vivo() then
+        matando = false
+        btnKill.Text = "⚔️ AUTO KILL: DESLIGADO"
+        btnKill.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        statusKill.Text = "🔴 DESATIVADO"
+        statusKill.TextColor3 = Color3.fromRGB(255, 100, 100)
+        alvoText.Text = "🎯 MORTO"
+        alvoText.TextColor3 = Color3.fromRGB(200, 50, 50)
+        if loopKill then loopKill:Disconnect() loopKill = nil end
+        return
+    end
+    
+    if not espada or not espada.Parent then
+        acharEspada()
+        if not espada then
+            statusKill.Text = "⚠️ SEM ESPADA!"
+            statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
+            wait(2)
+            return
+        end
+    end
+    
+    if not alvo or not alvo.Character or alvo.Character.Humanoid.Health <= 0 then
+        alvo = acharAlvo()
+        if alvo then
+            alvoText.Text = "🎯 "..alvo.Name
+            alvoText.TextColor3 = Color3.fromRGB(255, 50, 50)
+        else
+            alvoText.Text = "🎯 NENHUM ALVO"
+            alvoText.TextColor3 = Color3.fromRGB(200, 200, 200)
+            statusKill.Text = "🔍 PROCURANDO..."
+            statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
+            wait(1)
+            return
+        end
+    end
+    
+    if alvo and alvo.Character and alvo.Character.Humanoid.Health > 0 then
+        local hrp2 = alvo.Character:FindFirstChild("HumanoidRootPart")
+        if hrp2 then
+            local posAlvo = hrp2.Position
+            local dist = (posAlvo - hrp.Position).Magnitude
+            
+            local cf = hrp2.CFrame
+            local costas = cf.LookVector * -1
+            local posCostas = posAlvo + (costas * 3)
+            
+            if dist > 20 then
+                local dir = (posCostas - hrp.Position).Unit
+                hrp.CFrame = hrp.CFrame + (dir * 8)
+                statusKill.Text = "🏃 CORRENDO..."
+                statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
+                return
+            end
+            
+            if dist > 5 then
+                local dirCostas = (posCostas - hrp.Position).Unit
+                hrp.CFrame = hrp.CFrame + (dirCostas * 6)
+                statusKill.Text = "🎯 FLANQUEANDO..."
+                statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
+                return
+            end
+            
+            -- VIRA PARA O INIMIGO
+            local olhar = CFrame.lookAt(hrp.Position, posAlvo)
+            hrp.CFrame = CFrame.new(hrp.Position, olhar.LookVector + hrp.Position)
+            
+            -- ATACA DUAS VEZES RÁPIDO
+            pcall(function()
+                espada:Activate()
+                wait(0.1)
+                espada:Activate()
+            end)
+            
+            kills = kills + 1
+            contador.Text = "💎 "..diamantes.."  |  ⚔️ "..kills.."  |  ⚪ "..orbes
             statusKill.Text = "⚔️ ATACANDO!"
             statusKill.TextColor3 = Color3.fromRGB(255, 0, 0)
             alvoText.Text = "🎯 "..alvo.Name.." 💀"
@@ -522,212 +680,3 @@ function loopKill()
         end
     end
 end
-
--- ============================================
--- BOTÕES
--- ============================================
-
-btnColeta.MouseButton1Click:Connect(function()
-    if not vivo() then
-        statusColeta.Text = "⚠️ Morto!"
-        statusColeta.TextColor3 = Color3.fromRGB(255, 200, 0)
-        wait(1)
-        statusColeta.Text = "🔴 Desativado"
-        statusColeta.TextColor3 = Color3.fromRGB(255, 100, 100)
-        return
-    end
-    
-    coletando = not coletando
-    if coletando then
-        btnColeta.Text = "⏹ PARAR"
-        btnColeta.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        statusColeta.Text = "🟢 Coletando..."
-        statusColeta.TextColor3 = Color3.fromRGB(0, 255, 100)
-        if loopColeta then loopColeta:Disconnect() end
-        loopColeta = game:GetService("RunService").Heartbeat:Connect(function()
-            if coletando and vivo() then coletarDiamantes() end
-        end)
-    else
-        btnColeta.Text = "💎 ATIVAR COLETA"
-        btnColeta.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-        statusColeta.Text = "🔴 Desativado"
-        statusColeta.TextColor3 = Color3.fromRGB(255, 100, 100)
-        if loopColeta then loopColeta:Disconnect() loopColeta = nil end
-    end
-end)
-
-btnKill.MouseButton1Click:Connect(function()
-    if not vivo() then
-        statusKill.Text = "⚠️ Morto!"
-        statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
-        wait(1)
-        statusKill.Text = "🔴 Desativado"
-        statusKill.TextColor3 = Color3.fromRGB(255, 100, 100)
-        return
-    end
-    
-    matando = not matando
-    if matando then
-        acharEspada()
-        if not espada then
-            statusKill.Text = "⚠️ Sem espada!"
-            statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
-            matando = false
-            wait(2)
-            statusKill.Text = "🔴 Desativado"
-            statusKill.TextColor3 = Color3.fromRGB(255, 100, 100)
-            return
-        end
-        btnKill.Text = "⏹ PARAR"
-        btnKill.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
-        statusKill.Text = "🟢 Ativo"
-        statusKill.TextColor3 = Color3.fromRGB(0, 255, 100)
-        if loopKill then loopKill:Disconnect() end
-        loopKill = game:GetService("RunService").Heartbeat:Connect(function()
-            if matando then loopKill() wait(0.05) end
-        end)
-    else
-        btnKill.Text = "⚔️ ATIVAR KILL"
-        btnKill.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        statusKill.Text = "🔴 Desativado"
-        statusKill.TextColor3 = Color3.fromRGB(255, 100, 100)
-        alvo = nil
-        alvoText.Text = "🎯 Nenhum"
-        alvoText.TextColor3 = Color3.fromRGB(200, 200, 200)
-        if loopKill then loopKill:Disconnect() loopKill = nil end
-    end
-end)
-
-btnOrbes.MouseButton1Click:Connect(function()
-    if not vivo() then
-        statusOrbes.Text = "⚠️ Morto!"
-        statusOrbes.TextColor3 = Color3.fromRGB(255, 200, 0)
-        wait(1)
-        statusOrbes.Text = "🔴 Desativado"
-        statusOrbes.TextColor3 = Color3.fromRGB(255, 100, 100)
-        return
-    end
-    
-    coletandoOrbes = not coletandoOrbes
-    if coletandoOrbes then
-        btnOrbes.Text = "⏹ PARAR"
-        btnOrbes.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
-        statusOrbes.Text = "🟢 Coletando..."
-        statusOrbes.TextColor3 = Color3.fromRGB(0, 255, 100)
-        if loopOrbes then loopOrbes:Disconnect() end
-        loopOrbes = game:GetService("RunService").Heartbeat:Connect(function()
-            if coletandoOrbes and vivo() then coletarOrbes() end
-        end)
-    else
-        btnOrbes.Text = "⚪ ATIVAR ORBES"
-        btnOrbes.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
-        statusOrbes.Text = "🔴 Desativado"
-        statusOrbes.TextColor3 = Color3.fromRGB(255, 100, 100)
-        if loopOrbes then loopOrbes:Disconnect() loopOrbes = nil end
-    end
-end)
-
--- ===== RAIO =====
-raioMais.MouseButton1Click:Connect(function()
-    if raio < 300 then
-        raio = raio + 10
-        raioText.Text = "📏 Coleta:"..raio
-        raioValor.Text = raio
-        raioKillText.Text = "📏 Kill:"..raio
-        raioKillValor.Text = raio
-        raioOrbesText.Text = "📏 Orbes:"..raio
-        raioOrbesValor.Text = raio
-    end
-end)
-
-raioMenos.MouseButton1Click:Connect(function()
-    if raio > 30 then
-        raio = raio - 10
-        raioText.Text = "📏 Coleta:"..raio
-        raioValor.Text = raio
-        raioKillText.Text = "📏 Kill:"..raio
-        raioKillValor.Text = raio
-        raioOrbesText.Text = "📏 Orbes:"..raio
-        raioOrbesValor.Text = raio
-    end
-end)
-
--- ===== MINIMIZAR =====
-minBtn.MouseButton1Click:Connect(function()
-    minimizado = not minimizado
-    if minimizado then
-        frame.Size = UDim2.new(0, 220, 0, 30)
-        content.Visible = false
-        minBtn.Text = "□"
-        minBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-    else
-        frame.Size = UDim2.new(0, 220, 0, 260)
-        content.Visible = true
-        minBtn.Text = "─"
-        minBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
-    end
-end)
-
--- ===== FECHAR =====
-closeBtn.MouseButton1Click:Connect(function()
-    if loopColeta then loopColeta:Disconnect() end
-    if loopKill then loopKill:Disconnect() end
-    if loopOrbes then loopOrbes:Disconnect() end
-    gui:Destroy()
-    print("✅ Fechado!")
-end)
-
--- ============================================
--- RESPAWN
--- ============================================
-
-player.CharacterAdded:Connect(function(novoChar)
-    character = novoChar
-    hrp = character:WaitForChild("HumanoidRootPart")
-    humanoid = character:WaitForChild("Humanoid")
-    wait(2)
-    acharEspada()
-    if matando then
-        matando = false
-        btnKill.Text = "⚔️ ATIVAR KILL"
-        btnKill.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        statusKill.Text = "🔄 Reviveu!"
-        statusKill.TextColor3 = Color3.fromRGB(255, 200, 0)
-        alvoText.Text = "🎯 Reviveu"
-        alvoText.TextColor3 = Color3.fromRGB(0, 255, 100)
-        if loopKill then loopKill:Disconnect() loopKill = nil end
-        print("🔄 Reviveu! Ative o Kill manualmente.")
-    end
-end)
-
--- ============================================
--- LOOP
--- ============================================
-
-game:GetService("RunService").Heartbeat:Connect(function()
-    if vivo() then
-        statusText.Text = "❤️ VIVO"
-        statusText.TextColor3 = Color3.fromRGB(0, 255, 100)
-        if not coletandoOrbes then
-            local total = contarOrbes()
-            if total > 0 then
-                orbesDetect.Text = "🟢 Orbes: "..total
-                orbesDetect.TextColor3 = Color3.fromRGB(0, 255, 100)
-            else
-                orbesDetect.Text = "🔴 Orbes: 0"
-                orbesDetect.TextColor3 = Color3.fromRGB(255, 100, 100)
-            end
-        end
-    else
-        statusText.Text = "💀 MORTO"
-        statusText.TextColor3 = Color3.fromRGB(255, 50, 50)
-    end
-end)
-
-print("✅ SCRIPT CARREGADO!")
-print("💎 AZUL = Coleta Drops")
-print("⚔️ VERMELHO = Kill (Costas)")
-print("⚪ AMARELO = Orbes")
-print("📏 + e - = Raio")
-print("─ = Minimizar")
-print("✕ = Fechar")
